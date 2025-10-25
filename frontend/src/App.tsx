@@ -11,8 +11,9 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-// import ServisKayitlari from './pages/ServisKayitlari';
 import DashboardLayout  from './layout/Dashboardlayout';
+import Services from './pages/Services';
+import ServiceDetail from './pages/ServiceDetail';
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
@@ -38,7 +39,8 @@ return (
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* <Route path="/servis-kayitlari" element={<ServisKayitlari />} /> */}
+        <Route path="/Services" element={<Services />} />
+        <Route path="/Service/:id" element={<ServiceDetail />} />
       </Route>
 
       {/* Herhangi bir eşleşmeyen route login'e yönlensin */}

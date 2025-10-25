@@ -53,7 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         </ListItem>
 
         <ListItem disablePadding>
-          <ListItemButton onClick={() => { navigate('/servis-kayitlari'); handleDrawerToggle(); }}>
+          <ListItemButton onClick={() => { navigate('/Services'); handleDrawerToggle(); }}>
             <ListItemIcon>
               <BuildIcon />
             </ListItemIcon>

@@ -1,17 +1,22 @@
-﻿import React, { useContext, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+﻿import React, { useContext, useState, useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Box, AppBar, Toolbar, IconButton, Typography, CssBaseline } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import Sidebar from '../components/Sidebar';
 import { AuthContext } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 const drawerWidth = 240;
 
 const DashboardLayout = () => {
-    const { logout } = useContext(AuthContext);
+    const { logout, isAuthenticated, token } = useContext(AuthContext);
     const navigate = useNavigate();
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    useEffect(() => {
+        if (!isAuthenticated && !token) {
+            navigate('/');
+        }
+    }, [isAuthenticated, token, navigate]);
 
     const handleLogout = () => {
         logout();
@@ -26,28 +31,18 @@ const DashboardLayout = () => {
         <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             {/* Header */}
-            <AppBar
-                position="fixed"
-                sx={{
-                    width: { md: `calc(100% - ${drawerWidth}px)` },
-                    ml: { md: `${drawerWidth}px` },
-                }}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { md: 'none' } }}
-                    >
-                        <MenuIcon />
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        Dashboard
-                    </Typography>
-                </Toolbar>
-            </AppBar>
+
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    sx={{ mr: 2, display: { md: 'none' } }}
+                >
+                    <MenuIcon />
+                </IconButton>
+            </Toolbar>
 
             {/* Sidebar */}
             <Sidebar

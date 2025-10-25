@@ -7,7 +7,7 @@ from .serializers import ServisKayitSerializer
 
 # Tüm kayıtları listele ve yeni kayıt ekle
 class KayitListCreateAPIView(generics.ListCreateAPIView):
-    queryset = ServisKayit.objects.all().order_by('-gelis_tarihi')
+    queryset = ServisKayit.objects.all().order_by('-id')
     serializer_class = ServisKayitSerializer
 
 # Tekil kayıt: görüntüle, güncelle, sil
