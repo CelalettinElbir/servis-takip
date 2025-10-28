@@ -9,8 +9,10 @@ from .serializers import ServisKayitSerializer
 class KayitListCreateAPIView(generics.ListCreateAPIView):
     queryset = ServisKayit.objects.all().order_by('-id')
     serializer_class = ServisKayitSerializer
+    permission_classes = []
 
 # Tekil kayıt: görüntüle, güncelle, sil
 class KayitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = ServisKayit.objects.all()
     serializer_class = ServisKayitSerializer
+    permission_classes = []
