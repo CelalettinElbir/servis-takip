@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   Drawer,
   Toolbar,
@@ -17,6 +17,7 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { AuthContext } from '../context/AuthContext';
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -36,10 +37,10 @@ const NewSidebar: React.FC<SidebarProps> = ({
   const menuItems = [
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Servis Kayıtları", icon: <BuildIcon />, path: "/services" },
-    { text: "Kullanıcılar", icon: <PeopleIcon />, path: "/kullanicilar" },
-    { text: "Ayarlar", icon: <SettingsIcon />, path: "/settings" },
+    { text: "Kullanıcılar", icon: <PeopleIcon />, path: "/users" },
+    // { text: "Ayarlar", icon: <SettingsIcon />, path: "/settings" },
   ];
-
+  const { user } = useContext(AuthContext);
   const drawer = (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
       {/* Logo ve Başlık */}
@@ -79,7 +80,16 @@ const NewSidebar: React.FC<SidebarProps> = ({
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary="Çıkış Yap" />
+            <ListItemText primary={
+              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                Çıkış Yap
+                {user && (
+                  <Typography component="span" sx={{ fontWeight: 500, color: 'text.secondary' }}>
+                    ({user.first_name || user.username})
+                  </Typography>
+                )}
+              </Typography>
+            } />
           </ListItemButton>
         </ListItem>
       </List>

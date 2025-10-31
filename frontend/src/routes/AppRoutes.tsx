@@ -11,6 +11,7 @@ import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
 import ServiceNew from "../pages/ServiceNew"
+import Users from "../pages/users"
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
@@ -39,6 +40,7 @@ export default function AppRoutes() {
           <Route path="new" element={<ServiceNew/> }/>
           <Route path=":id" element={<ServiceDetail />} />
         </Route>
+        <Route path="/users" element={<Users />} />
         {/* <Route path="/services" element={<Services />} />
         <Route path="/service/:id" element={<ServiceDetail />} /> */}
       </Route>

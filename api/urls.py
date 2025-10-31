@@ -1,4 +1,4 @@
-"""
+﻿"""
 URL configuration for backend project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
@@ -16,10 +16,4 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('service.urls')),
-    path('api/auth/', include('accounts.urls')),
-    # path('api/', include('api.urls')),
-]
+from api.views import UserListView, UserCreateView, current_user    
