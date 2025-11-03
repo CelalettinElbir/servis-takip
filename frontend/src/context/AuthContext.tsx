@@ -1,8 +1,6 @@
 ﻿import React, { createContext, useState, useEffect, type ReactNode } from 'react';
-import axios from 'axios';
 import API, { setAuthToken } from '../api';
 
-// Kullanıcı tipi
 interface User {
   id: number;
   username: string;
@@ -11,24 +9,24 @@ interface User {
   last_name?: string;
 }
 
-// Context tipi
 interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   user: User | null;
+  loading: boolean; // ✅ yeni eklendi
   login: (token: string) => void;
   logout: () => void;
   setToken: (token: string) => void;
 }
 
-// Context oluşturuluyor
 export const AuthContext = createContext<AuthContextType>({
   token: null,
   isAuthenticated: false,
   user: null,
-  login: () => { },
-  logout: () => { },
-  setToken: () => { },
+  loading: true,
+  login: () => {},
+  logout: () => {},
+  setToken: () => {},
 });
 
 interface Props {
@@ -39,37 +37,38 @@ export const AuthProvider = ({ children }: Props) => {
   const [token, setTokenState] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // ✅
 
-  // Uygulama açıldığında localStorage'daki token'ı kontrol et
   useEffect(() => {
     const storedToken = localStorage.getItem('accessToken');
     if (storedToken) {
       setToken(storedToken);
       setIsAuthenticated(true);
       fetchCurrentUser();
+    } else {
+      setLoading(false); // token yoksa bile kontrol tamamlandı
     }
   }, []);
 
-  // Kullanıcı bilgilerini çek
   const fetchCurrentUser = async () => {
     try {
-      debugger;
       const response = await API.get('auth/me/');
       setUser(response.data);
     } catch (error) {
       console.error('Kullanıcı bilgisi alınamadı:', error);
       logout();
+    } finally {
+      setLoading(false); // ✅ kullanıcı bilgisi yüklendikten sonra
     }
   };
 
-  // Login işlemi
   const login = (accessToken: string) => {
     localStorage.setItem('accessToken', accessToken);
     setToken(accessToken);
-    fetchCurrentUser(accessToken);
+    setIsAuthenticated(true);
+    fetchCurrentUser();
   };
 
-  // Logout işlemi
   const logout = () => {
     localStorage.removeItem('accessToken');
     setTokenState(null);
@@ -77,14 +76,13 @@ export const AuthProvider = ({ children }: Props) => {
     setUser(null);
   };
 
-  // Token ayarlama
   const setToken = (accessToken: string) => {
     setAuthToken(accessToken);
     setTokenState(accessToken);
   };
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated, user, login, logout, setToken }}>
+    <AuthContext.Provider value={{ token, isAuthenticated, user, loading, login, logout, setToken }}>
       {children}
     </AuthContext.Provider>
   );

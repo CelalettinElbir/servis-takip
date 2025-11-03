@@ -12,12 +12,19 @@ import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
 import ServiceNew from "../pages/ServiceNew"
 import Users from "../pages/users"
+import Spinner from "../components/Spinner";
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
-  const { token } = useContext(AuthContext);
+  const { token, loading } = useContext(AuthContext);
+
+  if (loading) {
+    return <Spinner />; // artık şık bir spinner gözükecek
+  }
+
   return token ? children : <Navigate to="/login" replace />;
 };
+
 
 export default function AppRoutes() {
   return (
@@ -37,7 +44,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/services">
           <Route index element={<Services />} />
-          <Route path="new" element={<ServiceNew/> }/>
+          <Route path="new" element={<ServiceNew />} />
           <Route path=":id" element={<ServiceDetail />} />
         </Route>
         <Route path="/users" element={<Users />} />
