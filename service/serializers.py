@@ -15,7 +15,7 @@ class ServisKayitLogSerializer(serializers.ModelSerializer):
 # --- SERVIS KAYIT SERIALIZER ---
 class ServisKayitSerializer(serializers.ModelSerializer):
     # Her servis kaydının loglarını dahil et
-    logs = ServisKayitLogSerializer(many=True, read_only=True)
+    logs = serializers.SerializerMethodField()
 
     class Meta:
         model = ServisKayit
@@ -121,3 +121,8 @@ class ServisKayitSerializer(serializers.ModelSerializer):
         except Exception as e:
             print(f"Hata oluştu: {str(e)}")
             raise serializers.ValidationError({"error": "Kayıt güncellenirken bir hata oluştu."})
+
+
+    def get_logs(self, obj):
+        logs = obj.logs.order_by('-id')  # id'ye göre ters
+        return ServisKayitLogSerializer(logs, many=True).data

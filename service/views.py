@@ -27,7 +27,7 @@ class KayitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ServisKayitViewSet(viewsets.ModelViewSet):
-    queryset = ServisKayit.objects.all()
+    queryset = ServisKayit.objects.all().order_by('-id')  
     serializer_class = ServisKayitSerializer
     permission_classes = [IsAuthenticated]
 
