@@ -28,8 +28,12 @@ interface ServiceRecord {
   seri_no: string;
   servis_ismi: string;
   ariza: string;
-  servise_gonderim_tarihi: string;
+  servise_gonderim_tarihi: string | null;
   servisten_gelis_tarihi: string | null;
+  teslim_tarihi: string | null;
+  status: string;
+  gelis_tarihi: string;
+  created_user: number | null;
 }
 
 const Services = () => {
@@ -45,6 +49,7 @@ const Services = () => {
   const fetchRecords = async () => {
     try {
       const response = await API.get("Services/");
+      console.log(response.data.results);
       setRecords(response.data.results);
     } catch (err) {
       console.error(err);
@@ -146,12 +151,26 @@ const Services = () => {
           <TableBody>
             {filteredRecords.map((record) => {
               let durumColor = "warning.main";
-              if (record.servisten_gelis_tarihi) durumColor = "success.main";
-              else if (
-                !record.servisten_gelis_tarihi &&
-                record.servise_gonderim_tarihi
-              )
-                durumColor = "error.main";
+              let durumText = record.status;
+              debugger;
+              switch (record.status) {
+                case 'beklemede':
+                  durumColor = "warning.main";
+                  durumText = "Beklemede";
+                  break;
+                case 'servise_gitti':
+                  durumColor = "error.main";
+                  durumText = "Servise Gitti";
+                  break;
+                case 'servisten_geldi':
+                  durumColor = "info.main";
+                  durumText = "Servisten Geldi";
+                  break;
+                case 'teslim_edildi':
+                  durumColor = "success.main";
+                  durumText = "Teslim Edildi";
+                  break;
+              }
 
               return (
                 <TableRow key={record.id}>
@@ -163,11 +182,7 @@ const Services = () => {
                   <TableCell>{record.servise_gonderim_tarihi}</TableCell>
                   <TableCell>
                     <Typography sx={{ color: durumColor, fontWeight: "bold" }}>
-                      {record.servisten_gelis_tarihi
-                        ? "Tamamlandı"
-                        : record.servise_gonderim_tarihi
-                        ? "Serviste"
-                        : "Beklemede"}
+                      {durumText}
                     </Typography>
                   </TableCell>
                   <TableCell>

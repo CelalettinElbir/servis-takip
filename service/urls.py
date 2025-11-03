@@ -1,10 +1,10 @@
 ﻿from django.urls import path
-from .views import KayitListCreateAPIView, KayitRetrieveUpdateDestroyAPIView
+from .views import  KayitRetrieveUpdateDestroyAPIView,ServisKayitViewSet
 
 urlpatterns = [
     # Listeleme ve yeni kayıt ekleme
-    path('Services/', KayitListCreateAPIView.as_view(), name='kayit-list-create'),
+    path('Services/', ServisKayitViewSet.as_view({'get': 'list', 'post': 'create'}), name='kayit-list-create'),
     
     # Tekil kayıt işlemleri (GET, PUT, PATCH, DELETE)
-    path('Services/<int:pk>/', KayitRetrieveUpdateDestroyAPIView.as_view(), name='kayit-detail'),
+    path('Services/<int:pk>/', ServisKayitViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update', 'delete': 'destroy'}), name='kayit-detail'),
 ]

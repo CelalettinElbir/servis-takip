@@ -20,6 +20,7 @@ interface NewService {
   ariza: string;
   gelis_tarihi: string;
   aksesuar: string | null;
+  status: string;
 }
 
 const ServiceNew: React.FC = () => {
@@ -33,6 +34,7 @@ const ServiceNew: React.FC = () => {
     ariza: "",
     gelis_tarihi: "",
     aksesuar: "",
+    status: "beklemede"
   });
 
   const [saving, setSaving] = useState(false);
