@@ -29,6 +29,8 @@ class ServisKayit(models.Model):
         (STATUS_TESLIM_EDILDI, 'Teslim Edildi'),
     ]
     
+    updated_at = models.DateTimeField(auto_now=True)  # Her güncelleme işleminde otomatik güncellenir
+    
     musteri_adi = models.CharField(max_length=255)
     marka = models.CharField(max_length=100)
     model = models.CharField(max_length=100)

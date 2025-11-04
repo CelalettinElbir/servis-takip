@@ -47,24 +47,8 @@ INSTALLED_APPS = [
     'django_celery_results',
 ]
 
-# Celery Configuration
-CELERY_BROKER_URL = 'db+sqlite:///celery.sqlite3'
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TIMEZONE = 'UTC'
 
-# Celery Beat Settings
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# Celery Beat Schedule
-CELERY_BEAT_SCHEDULE = {
-    'check-inactive-services': {
-        'task': 'accounts.tasks.check_service_records',
-        'schedule': crontab(hour='9', minute='0'),  # Her gün saat 09:00'da çalışır
-    },
-}
 
 MIDDLEWARE = [
       'corsheaders.middleware.CorsMiddleware',
@@ -208,18 +192,20 @@ CORS_ALLOW_HEADERS = [
     "origin",
 ]
 
-# Celery Configuration
+
+# Redis broker (PostgreSQL yerine)
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Opsiyonel: Cache backend
+CELERY_CACHE_BACKEND = 'django-cache'
+
+# Serialization
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Europe/Istanbul'
 
-# Celery Beat Settings
-CELERY_BEAT_SCHEDULE = {
-    'check-service-records': {
-        'task': 'accounts.tasks.check_service_records',
-        'schedule': timedelta(days=1),  # Her gün çalıştır
-    },
-}
+# Bağlantı ayarları
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+CELERY_RESULT_EXPIRES = 3600  # Sonuçlar 1 saat saklanır
