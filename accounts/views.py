@@ -2,7 +2,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .serializers import RegisterSerializer
-
+from .models import Notification
+from .serializers import NotificationSerializer
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from django.contrib.auth.models import User
@@ -42,3 +43,14 @@ class UserCreateView(generics.CreateAPIView):
 def current_user(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+
+
+class NotificationListView(generics.ListAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Sadece giriş yapmış kullanıcının bildirimlerini döndür
+        return self.queryset.filter(user=self.request.user)

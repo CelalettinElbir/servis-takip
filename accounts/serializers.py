@@ -1,6 +1,8 @@
 ﻿from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
+from .models import Notification
+from service.serializers import ServisKayitSerializer
 
 # Kullanıcı kayıt serializer
 class RegisterSerializer(serializers.ModelSerializer):
@@ -50,3 +52,14 @@ class UserCreateSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    service_record = ServisKayitSerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Notification
+        fields = ['id', 'user', 'service_record', 'notification_type', 'message', 
+                 'created_at', 'is_read', 'overdue_days']
+        read_only_fields = ['created_at']

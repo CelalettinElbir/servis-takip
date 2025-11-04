@@ -38,6 +38,8 @@ const NewSidebar: React.FC<SidebarProps> = ({
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Servis Kayıtları", icon: <BuildIcon />, path: "/services" },
     { text: "Kullanıcılar", icon: <PeopleIcon />, path: "/users" },
+    { text: "Bildirimler", icon: <PeopleIcon />, path: "/notifications" },
+
     // { text: "Ayarlar", icon: <SettingsIcon />, path: "/settings" },
   ];
   const { user } = useContext(AuthContext);
