@@ -1,6 +1,8 @@
 ﻿from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from django.contrib.auth.models import User
+
+from api.models import Brand, Customer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -24,3 +26,23 @@ class UserCreateSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+    
+    
+    
+    
+class BrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Brand
+        fields = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+        
+        
+        
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Customer
+        fields = [
+            'id', 'company_code', 'company_name', 'address',
+            'email', 'tax_number', 'tax_office', 'is_active', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']

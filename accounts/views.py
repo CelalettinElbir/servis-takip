@@ -54,3 +54,5 @@ class NotificationListView(generics.ListAPIView):
     def get_queryset(self):
         # Sadece giriş yapmış kullanıcının bildirimlerini döndür
         return self.queryset.filter(user=self.request.user)
+    
+    
