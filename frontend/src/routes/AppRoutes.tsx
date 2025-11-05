@@ -11,7 +11,7 @@ import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
 import ServiceNew from "../pages/ServiceNew"
-import Users from "../pages/users"
+import Users from "../pages/Users"
 import Spinner from "../components/Spinner";
 import Notifications from "../pages/Notifications";
 
