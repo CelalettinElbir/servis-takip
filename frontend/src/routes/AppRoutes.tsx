@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
@@ -10,7 +10,9 @@ import DashboardLayout from "../layout/DashboardLayout";
 import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
-import ServiceNew from "../pages/ServiceNew"
+import ServiceNew from "../pages/ServiceNew";
+import QuoteList from "../pages/QuoteList";
+import QuotesPage from "../pages/QuotesPage";
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
@@ -19,32 +21,36 @@ const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 };
 
 export default function AppRoutes() {
+  const [showCreate, setShowCreate] = useState(false);
+
   return (
     <Routes>
+      {/* Teklif listesi */}
+      <Route path="/" element={<QuotesPage />} />
       {/* Giriş ve kayıt sayfaları */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      {/* <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} /> */}
 
       {/* Layout içinde çalışacak korumalı sayfalar */}
-      <Route
+      {/* <Route
         element={
           <PrivateRoute>
             <NewDashboard />
           </PrivateRoute>
         }
-      >
-        <Route path="/dashboard" element={<Dashboard />} />
+      > */}
+      {/* <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/services">
           <Route index element={<Services />} />
           <Route path="new" element={<ServiceNew/> }/>
           <Route path=":id" element={<ServiceDetail />} />
-        </Route>
-        {/* <Route path="/services" element={<Services />} />
+        </Route> */}
+      {/* <Route path="/services" element={<Services />} />
         <Route path="/service/:id" element={<ServiceDetail />} /> */}
-      </Route>
+      {/* </Route> */}
 
       {/* Eşleşmeyen tüm yollar login'e yönlensin */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
     </Routes>
   );
 }
