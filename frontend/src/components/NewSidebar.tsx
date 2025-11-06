@@ -17,7 +17,8 @@ import BuildIcon from "@mui/icons-material/Build";
 import PeopleIcon from "@mui/icons-material/People";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { AuthContext } from '../context/AuthContext';
+import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
+import { AuthContext } from "../context/AuthContext";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -39,6 +40,7 @@ const NewSidebar: React.FC<SidebarProps> = ({
     { text: "Servis Kayıtları", icon: <BuildIcon />, path: "/services" },
     { text: "Kullanıcılar", icon: <PeopleIcon />, path: "/users" },
     { text: "Bildirimler", icon: <PeopleIcon />, path: "/notifications" },
+    { text: "Teklifler", icon: <RequestQuoteIcon />, path: "/quote" },
 
     // { text: "Ayarlar", icon: <SettingsIcon />, path: "/settings" },
   ];
@@ -82,16 +84,23 @@ const NewSidebar: React.FC<SidebarProps> = ({
             <ListItemIcon>
               <LogoutIcon />
             </ListItemIcon>
-            <ListItemText primary={
-              <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                Çıkış Yap
-                {user && (
-                  <Typography component="span" sx={{ fontWeight: 500, color: 'text.secondary' }}>
-                    ({user.first_name || user.username})
-                  </Typography>
-                )}
-              </Typography>
-            } />
+            <ListItemText
+              primary={
+                <Typography
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
+                  Çıkış Yap
+                  {user && (
+                    <Typography
+                      component="span"
+                      sx={{ fontWeight: 500, color: "text.secondary" }}
+                    >
+                      ({user.first_name || user.username})
+                    </Typography>
+                  )}
+                </Typography>
+              }
+            />
           </ListItemButton>
         </ListItem>
       </List>

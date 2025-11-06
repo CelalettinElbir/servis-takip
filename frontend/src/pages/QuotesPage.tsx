@@ -46,7 +46,7 @@ export default function QuotesPage() {
   console.log("data", quotes);
 
   return (
-    <>
+    <div className="flex flex-col h-full w-full">
       <QuoteList onNew={() => setModalOpen(true)} quotes={quotes} />
 
       <NewQuoteModal
@@ -54,6 +54,6 @@ export default function QuotesPage() {
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
       />
-    </>
+    </div>
   );
 }

@@ -35,7 +35,7 @@ interface QuoteListProps {
 
 export default function QuoteList({ onNew, quotes }: QuoteListProps) {
   return (
-    <div className="flex flex-col h-screen w-screen">
+    <div className="flex flex-col h-full w-full">
       {/* Başlık ve Buton */}
       <div className="flex justify-between items-center p-4 bg-white shadow-md z-10">
         <h1 className="text-2xl font-bold">Teklif Listesi</h1>
