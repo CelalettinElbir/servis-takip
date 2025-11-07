@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -8,8 +8,29 @@ import {
   Grid,
   Paper,
   Divider,
+  Autocomplete,
 } from "@mui/material";
 import API from "../api";
+
+interface Customer {
+  id: number;
+  company_code: string;
+  company_name: string;
+  address: string;
+  email: string;
+  tax_number: string;
+  tax_office: string;
+  is_active: boolean;
+}
+
+interface Brand {
+  id: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 interface NewService {
   musteri_adi: string;
@@ -22,6 +43,9 @@ interface NewService {
   aksesuar: string | null;
   status: string;
 }
+
+
+
 
 const ServiceNew: React.FC = () => {
   const navigate = useNavigate();
@@ -38,6 +62,35 @@ const ServiceNew: React.FC = () => {
   });
 
   const [saving, setSaving] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+    const [brands, setBrands] = useState<Brand[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+  const searchCustomers = async (searchTerm: string) => {
+    setLoading(true);
+    try {
+      const response = await API.get(`customers/?search=${searchTerm}`);
+      setCustomers(response.data.results);
+    } catch (error) {
+      console.error('Error fetching customers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchBrands = async () => {
+    try {
+      const response = await API.get('brands/');
+      setBrands(response.data.results);
+    } catch (error) {
+      console.error('Error fetching brands:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrands();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -45,7 +98,6 @@ const ServiceNew: React.FC = () => {
     setService({ ...service, [e.target.name]: e.target.value });
   };
 
-  console.log(service);
   const handleSubmit = async () => {
     setSaving(true);
     try {
@@ -71,23 +123,53 @@ const ServiceNew: React.FC = () => {
       <Paper elevation={3} sx={{ p: 3 }}>
         {/* Üst kısım: Kısa inputlar */}
         <Box sx={{ mb: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Müşteri Adı"
-                name="musteri_adi"
-                value={service.musteri_adi}
-                onChange={handleChange}
-                fullWidth
+          <Grid container component="div" spacing={2}>
+            <Grid item component="div" xs={12} >
+              <Autocomplete
+                options={customers}
+                loading={loading}
+                value={selectedCustomer}
+                onChange={(event, newValue) => {
+                  setSelectedCustomer(newValue);
+                  setService(prev => ({
+                    ...prev,
+                    musteri_adi: newValue?.company_name || ''
+                  }));
+                }}
+                onInputChange={(event, newInputValue) => {
+                  if (newInputValue) {
+                    searchCustomers(newInputValue);
+                  }
+                }}
+                getOptionLabel={(option) => option.company_name}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Müşteri Adı"
+                    fullWidth
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
-              <TextField
-                label="Marka"
-                name="marka"
-                value={service.marka}
-                onChange={handleChange}
-                fullWidth
+              <Autocomplete
+                options={brands}
+                value={brands.find(brand => brand.name === service.marka) || null}
+                onChange={(_, newValue) => {
+                  setService(prev => ({
+                    ...prev,
+                    marka: newValue ? newValue.name : ''
+                  }));
+                }}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Marka"
+                    fullWidth
+                  />
+                )}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
