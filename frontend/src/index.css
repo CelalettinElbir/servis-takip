@@ -76,3 +76,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* global.css veya component içinde style */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox için */
+}

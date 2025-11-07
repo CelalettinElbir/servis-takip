@@ -10,10 +10,11 @@ import DashboardLayout from "../layout/DashboardLayout";
 import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
-import ServiceNew from "../pages/ServiceNew"
-import Users from "../pages/users"
+import ServiceNew from "../pages/ServiceNew";
+import Users from "../pages/Users";
 import Spinner from "../components/Spinner";
 import Notifications from "../pages/Notifications";
+import QuatesPage from "../pages/QuotesPage";
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
@@ -25,7 +26,6 @@ const PrivateRoute = ({ children }: { children: JSX.Element }) => {
 
   return token ? children : <Navigate to="/login" replace />;
 };
-
 
 export default function AppRoutes() {
   return (
@@ -50,6 +50,7 @@ export default function AppRoutes() {
         </Route>
         <Route path="/users" element={<Users />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/quote" element={<QuatesPage />} />
         {/* <Route path="/services" element={<Services />} />
         <Route path="/service/:id" element={<ServiceDetail />} /> */}
       </Route>
