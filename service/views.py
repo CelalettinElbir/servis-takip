@@ -2,8 +2,8 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework import generics, viewsets
-from .models import ServisKayit, ServisKayitLog
-from .serializers import ServisKayitSerializer, ServisKayitLogSerializer
+from .models import ServiceLog, ServiceRecord
+from .serializers import ServiceRecordSerializer, ServiceLogSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -19,21 +19,19 @@ from rest_framework.response import Response
 
 # Tekil kayıt: görüntüle, güncelle, sil
 class KayitRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ServisKayit.objects.all()
-    serializer_class = ServisKayitSerializer
+    queryset = ServiceRecord.objects.all()
+    serializer_class = ServiceRecordSerializer
     permission_classes = []
 
 
-
-
-class ServisKayitViewSet(viewsets.ModelViewSet):
-    queryset = ServisKayit.objects.all().order_by('-id')  
-    serializer_class = ServisKayitSerializer
+class ServiceRecordViewSet(viewsets.ModelViewSet):
+    queryset = ServiceRecord.objects.all().order_by('-id')  
+    serializer_class = ServiceRecordSerializer
     permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['get'])
     def logs(self, request, pk=None):
-        servis_kayit = self.get_object()
-        logs = ServisKayitLog.objects.filter(servis_kayit=servis_kayit).order_by('-degisiklik_tarihi')
-        serializer = ServisKayitLogSerializer(logs, many=True)
+        service_record = self.get_object()
+        logs = ServiceLog.objects.filter(service_record=service_record).order_by('-change_date')
+        serializer = ServiceLogSerializer(logs, many=True)
         return Response(serializer.data)

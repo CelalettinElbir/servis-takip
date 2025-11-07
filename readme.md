@@ -27,3 +27,26 @@ celery -A backend  worker --pool=solo -l info
 celery -A backend worker --loglevel=info --pool=solo
 
 celery -A backend beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+
+
+
+
+from seeder.seedClass import seederClass
+
+# Excel dosyasının yolunu belirtin
+excel_path = "path/to/your/excel.xlsx"
+
+# Seeder sınıfını başlat
+seeder = seederClass(excel_path)
+
+# Verileri içe aktar
+seeder.seed_customers()  # Müşteri verilerini içe aktar
+seeder.seed_brands()  ,
+
+
+
+başarılı şekli buradakidir.
+from seeder.seedClass import seederClass
+seeder = seederClass("MARKALAR.xlsx")    
+seeder.seed_brands()

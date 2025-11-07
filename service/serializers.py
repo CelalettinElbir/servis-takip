@@ -1,24 +1,24 @@
 ﻿from rest_framework import serializers
 import datetime
-from .models import ServisKayit, ServisKayitLog
+from .models import ServiceLog, ServiceRecord
 
 
 # --- LOG SERIALIZER ---
-class ServisKayitLogSerializer(serializers.ModelSerializer):
+class ServiceLogSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()  # kullanıcı adını göstermek için
 
     class Meta:
-        model = ServisKayitLog
-        fields = ['id', 'user', 'degisiklik_tarihi', 'changed_fields']
+        model = ServiceLog
+        fields = ['id', 'user', 'change_date', 'changed_fields']
 
 
-# --- SERVIS KAYIT SERIALIZER ---
-class ServisKayitSerializer(serializers.ModelSerializer):
+# --- SERVICE RECORD SERIALIZER ---
+class ServiceRecordSerializer(serializers.ModelSerializer):
     # Her servis kaydının loglarını dahil et
     logs = serializers.SerializerMethodField()
 
     class Meta:
-        model = ServisKayit
+        model = ServiceRecord
         fields = [
             'id',
             'musteri_adi',
@@ -81,13 +81,13 @@ class ServisKayitSerializer(serializers.ModelSerializer):
             teslim_tarihi = validated_data.get("teslim_tarihi")
 
             if teslim_tarihi:
-                validated_data["status"] = ServisKayit.STATUS_TESLIM_EDILDI
+                validated_data["status"] = ServiceRecord.STATUS_TESLIM_EDILDI
             elif servisten_gelis_tarihi:
-                validated_data["status"] = ServisKayit.STATUS_SERVISTEN_GELDI
+                validated_data["status"] = ServiceRecord.STATUS_SERVISTEN_GELDI
             elif servise_gonderim_tarihi:
-                validated_data["status"] = ServisKayit.STATUS_SERVISE_GITTI
+                validated_data["status"] = ServiceRecord.STATUS_SERVISE_GITTI
             else:
-                validated_data["status"] = ServisKayit.STATUS_BEKLEMEDE
+                validated_data["status"] = ServiceRecord.STATUS_BEKLEMEDE
 
             # Güncelle
             instance = super().update(instance, validated_data)
@@ -110,8 +110,8 @@ class ServisKayitSerializer(serializers.ModelSerializer):
 
             # Sadece değişiklik varsa log kaydet
             if changed_fields:
-                ServisKayitLog.objects.create(
-                    servis_kayit=instance,
+                ServiceLog.objects.create(
+                    service_record=instance,
                     user=user,
                     changed_fields=changed_fields
                 )
@@ -125,4 +125,4 @@ class ServisKayitSerializer(serializers.ModelSerializer):
 
     def get_logs(self, obj):
         logs = obj.logs.order_by('-id')  # id'ye göre ters
-        return ServisKayitLogSerializer(logs, many=True).data
+        return ServiceLogSerializer(logs, many=True).data

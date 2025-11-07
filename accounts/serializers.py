@@ -2,7 +2,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import Notification
-from service.serializers import ServisKayitSerializer
+from service.serializers import ServiceRecordSerializer
 
 # Kullanıcı kayıt serializer
 class RegisterSerializer(serializers.ModelSerializer):
@@ -55,7 +55,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    service_record = ServisKayitSerializer(read_only=True)
+    service_record = ServiceRecordSerializer(read_only=True)
     user = UserSerializer(read_only=True)
 
     class Meta:

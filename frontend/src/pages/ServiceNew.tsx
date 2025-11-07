@@ -44,9 +44,6 @@ interface NewService {
   status: string;
 }
 
-
-
-
 const ServiceNew: React.FC = () => {
   const navigate = useNavigate();
   const [service, setService] = useState<NewService>({
@@ -58,14 +55,16 @@ const ServiceNew: React.FC = () => {
     ariza: "",
     gelis_tarihi: "",
     aksesuar: "",
-    status: "beklemede"
+    status: "beklemede",
   });
 
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
-    const [brands, setBrands] = useState<Brand[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
 
   const searchCustomers = async (searchTerm: string) => {
     setLoading(true);
@@ -73,7 +72,7 @@ const ServiceNew: React.FC = () => {
       const response = await API.get(`customers/?search=${searchTerm}`);
       setCustomers(response.data.results);
     } catch (error) {
-      console.error('Error fetching customers:', error);
+      console.error("Error fetching customers:", error);
     } finally {
       setLoading(false);
     }
@@ -81,10 +80,10 @@ const ServiceNew: React.FC = () => {
 
   const fetchBrands = async () => {
     try {
-      const response = await API.get('brands/');
+      const response = await API.get("brands/");
       setBrands(response.data.results);
     } catch (error) {
-      console.error('Error fetching brands:', error);
+      console.error("Error fetching brands:", error);
     }
   };
 
@@ -121,108 +120,119 @@ const ServiceNew: React.FC = () => {
       </Typography>
 
       <Paper elevation={3} sx={{ p: 3 }}>
-        {/* Üst kısım: Kısa inputlar */}
-        <Box sx={{ mb: 2 }}>
-          <Grid container component="div" spacing={2}>
-            <Grid item component="div" xs={12} >
-              <Autocomplete
-                options={customers}
-                loading={loading}
-                value={selectedCustomer}
-                onChange={(event, newValue) => {
-                  setSelectedCustomer(newValue);
-                  setService(prev => ({
-                    ...prev,
-                    musteri_adi: newValue?.company_name || ''
-                  }));
-                }}
-                onInputChange={(event, newInputValue) => {
-                  if (newInputValue) {
-                    searchCustomers(newInputValue);
-                  }
-                }}
-                getOptionLabel={(option) => option.company_name}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Müşteri Adı"
-                    fullWidth
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Autocomplete
-                options={brands}
-                value={brands.find(brand => brand.name === service.marka) || null}
-                onChange={(_, newValue) => {
-                  setService(prev => ({
-                    ...prev,
-                    marka: newValue ? newValue.name : ''
-                  }));
-                }}
-                getOptionLabel={(option) => option.name}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Marka"
-                    fullWidth
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Model"
-                name="model"
-                value={service.model}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Seri No"
-                name="seri_no"
-                value={service.seri_no}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Servis İsmi"
-                name="servis_ismi"
-                value={service.servis_ismi}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Aksesuar"
-                name="aksesuar"
-                value={service.aksesuar || ""}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} sx={{ width: 222 }}>
-              <TextField
-                label="Geliş Tarihi"
-                name="gelis_tarihi"
-                type="date"
-                value={service.gelis_tarihi}
-                onChange={handleChange}
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-          </Grid>
+        {/* Üst satır: müşteri adı, marka, model, seri no */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box sx={{ flex: "1 1 250px" }}>
+            <Autocomplete
+              options={customers}
+              loading={loading}
+              value={selectedCustomer}
+              onChange={(event, newValue) => {
+                setSelectedCustomer(newValue);
+                setService((prev) => ({
+                  ...prev,
+                  musteri_adi: newValue?.company_name || "",
+                }));
+              }}
+              onInputChange={(event, newInputValue) => {
+                if (newInputValue) searchCustomers(newInputValue);
+              }}
+              getOptionLabel={(option) => option.company_name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => (
+                <TextField {...params} label="Müşteri Adı" fullWidth />
+              )}
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <Autocomplete
+              options={brands}
+              value={brands.find((b) => b.name === service.marka) || null}
+              onChange={(_, newValue) =>
+                setService((prev) => ({
+                  ...prev,
+                  marka: newValue ? newValue.name : "",
+                }))
+              }
+              getOptionLabel={(option) => option.name}
+              renderInput={(params) => (
+                <TextField {...params} label="Marka" fullWidth />
+              )}
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Model"
+              name="model"
+              value={service.model}
+              onChange={handleChange}
+              fullWidth
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Seri No"
+              name="seri_no"
+              value={service.seri_no}
+              onChange={handleChange}
+              fullWidth
+            />
+          </Box>
         </Box>
 
-        {/* Alt kısım: Arıza alanı */}
+        {/* İkinci satır: servis ismi, aksesuar, geliş tarihi */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box sx={{ flex: "1 1 250px" }}>
+            <TextField
+              label="Servis İsmi"
+              name="servis_ismi"
+              value={service.servis_ismi}
+              onChange={handleChange}
+              fullWidth
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 250px" }}>
+            <TextField
+              label="Aksesuar"
+              name="aksesuar"
+              value={service.aksesuar || ""}
+              onChange={handleChange}
+              fullWidth
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Geliş Tarihi"
+              name="gelis_tarihi"
+              type="date"
+              value={service.gelis_tarihi}
+              onChange={handleChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+        </Box>
+
+        {/* Arıza açıklaması */}
         <Box sx={{ mt: 3 }}>
           <TextField
             label="Arıza"
@@ -235,6 +245,7 @@ const ServiceNew: React.FC = () => {
           />
         </Box>
 
+        {/* Kaydet butonu */}
         <Box sx={{ mt: 3 }}>
           <Divider sx={{ my: 2 }} />
           <Button
@@ -248,6 +259,7 @@ const ServiceNew: React.FC = () => {
         </Box>
       </Paper>
     </Box>
+
   );
 };
 

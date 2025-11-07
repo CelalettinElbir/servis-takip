@@ -12,6 +12,12 @@ class Customer(models.Model):
         max_length=255,
         verbose_name="Company Name"
     )
+    company_long_name = models.CharField(
+        max_length=255,
+        verbose_name="Company Long Name",
+        blank=True,
+        null=True
+    )
     address = models.TextField(
         blank=True,
         null=True,
