@@ -44,6 +44,8 @@ seeder = seederClass(excel_path)
 seeder.seed_customers()  # Müşteri verilerini içe aktar
 seeder.seed_brands()  ,
 
+seeder.seed_services()
+
 
 
 başarılı şekli buradakidir.
