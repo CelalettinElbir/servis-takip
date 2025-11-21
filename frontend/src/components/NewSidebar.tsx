@@ -19,6 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import RequestQuoteIcon from "@mui/icons-material/RequestQuote";
 import { AuthContext } from "../context/AuthContext";
+import { Notifications } from "@mui/icons-material";
 
 interface SidebarProps {
   mobileOpen: boolean;
@@ -39,7 +40,7 @@ const NewSidebar: React.FC<SidebarProps> = ({
     { text: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
     { text: "Servis Kayıtları", icon: <BuildIcon />, path: "/services" },
     { text: "Kullanıcılar", icon: <PeopleIcon />, path: "/users" },
-    { text: "Bildirimler", icon: <PeopleIcon />, path: "/notifications" },
+    { text: "Bildirimler", icon: <Notifications />, path: "/notifications" },
     { text: "Teklifler", icon: <RequestQuoteIcon />, path: "/quote" },
 
     // { text: "Ayarlar", icon: <SettingsIcon />, path: "/settings" },

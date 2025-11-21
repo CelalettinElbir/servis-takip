@@ -1,6 +1,9 @@
 ﻿from rest_framework import serializers
 import datetime
+
+from api.serializers import BrandSerializer, CustomerSerializer
 from .models import ServiceLog, ServiceRecord
+from api.models import Brand, Customer
 
 
 # --- LOG SERIALIZER ---
@@ -10,33 +13,50 @@ class ServiceLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ServiceLog
         fields = ['id', 'user', 'change_date', 'changed_fields']
+        ref_name = "ServiceLogSerializer"
 
 
 # --- SERVICE RECORD SERIALIZER ---
 class ServiceRecordSerializer(serializers.ModelSerializer):
     # Her servis kaydının loglarını dahil et
     logs = serializers.SerializerMethodField()
-
+    customer = CustomerSerializer(read_only=True)
+    brand =  BrandSerializer(read_only=True)
+    customer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all(),
+        source='customer',
+        write_only=True
+    )
+    brand_id = serializers.PrimaryKeyRelatedField(
+        queryset=Brand.objects.all(),
+        source='brand',
+        write_only=True
+    )
     class Meta:
         model = ServiceRecord
+        ref_name = "ServiceRecordSerializer"
         fields = [
             'id',
-            'musteri_adi',
-            'marka',
-            'model',
-            'seri_no',
-            'aksesuar',
-            'gelis_tarihi',
-            'ariza',
-            'servis_ismi',
-            'servise_gonderim_tarihi',
-            'yapilan_islem',
-            'servisten_gelis_tarihi',
-            'teslim_tarihi',
-            'created_user',
-            'status',
+             'brand_id', 'customer_id',
+            'customer',                 # müşteri
+            'brand',                    # marka
+            'model',                    # model
+            'serial_number',            # seri_no
+            'accessories',              # aksesuar
+            'arrival_date',             # gelis_tarihi
+            'issue',                    # ariza
+            'service_name',             # servis_ismi
+            'service_send_date',        # servise_gonderim_tarihi
+            'service_operation',        # yapilan_islem
+            'service_return_date',      # servisten_gelis_tarihi
+            'delivery_date',            # teslim_tarihi
+            'created_user',             # kaydı oluşturan kullanıcı
+            'status',                   # durum
+            'updated_at',               # güncellenme tarihi
             'logs',  # 🔹 Loglar burada eklendi
+
         ]
+
 
 
     def create(self, validated_data):
@@ -50,13 +70,21 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
                 if field.name == "id":
                     continue
                 value = getattr(instance, field.name)
+
+                # Eğer ManyToOne (ForeignKey) ise sadece id veya str(value) al
+                if hasattr(value, "id"):
+                    value = value.id  # veya str(value) istersen ismi alabilirsin
+                
+                # Tarihleri string formatına çevir
                 if isinstance(value, (datetime.date, datetime.datetime)):
                     value = value.isoformat()
+                
                 changed_fields[field.name] = value
 
+
             # Log kaydı oluştur
-            ServisKayitLog.objects.create(
-                servis_kayit=instance,
+            ServiceLog.objects.create(
+                service_record=instance,
                 user=user,
                 changed_fields=changed_fields
             )
@@ -73,21 +101,33 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
             user = self.context['request'].user
 
             # Güncelleme öncesi eski değerleri al
-            eski_degerler = {field.name: getattr(instance, field.name) for field in instance._meta.fields}
+            eski_degerler = {}
+            for field in instance._meta.fields:
+                field_name = field.name
+                old_value = getattr(instance, field_name)
+                
+                # ForeignKey için obje referansını sakla
+                if hasattr(old_value, 'pk') and old_value is not None:
+                    eski_degerler[field_name] = {
+                        'id': old_value.pk,
+                        'str': str(old_value)
+                    }
+                else:
+                    eski_degerler[field_name] = old_value
 
             # Otomatik durum güncellemesi
-            servise_gonderim_tarihi = validated_data.get("servise_gonderim_tarihi")
-            servisten_gelis_tarihi = validated_data.get("servisten_gelis_tarihi")
-            teslim_tarihi = validated_data.get("teslim_tarihi")
+            servise_gonderim_tarihi = validated_data.get("service_send_date")
+            servisten_gelis_tarihi = validated_data.get("service_return_date")
+            teslim_tarihi = validated_data.get("delivery_date")
 
             if teslim_tarihi:
-                validated_data["status"] = ServiceRecord.STATUS_TESLIM_EDILDI
+                validated_data["status"] = ServiceRecord.STATUS_DELIVERED
             elif servisten_gelis_tarihi:
-                validated_data["status"] = ServiceRecord.STATUS_SERVISTEN_GELDI
+                validated_data["status"] = ServiceRecord.STATUS_RETURNED_FROM_SERVICE
             elif servise_gonderim_tarihi:
-                validated_data["status"] = ServiceRecord.STATUS_SERVISE_GITTI
+                validated_data["status"] = ServiceRecord.STATUS_SENT_TO_SERVICE
             else:
-                validated_data["status"] = ServiceRecord.STATUS_BEKLEMEDE
+                validated_data["status"] = ServiceRecord.STATUS_PENDING
 
             # Güncelle
             instance = super().update(instance, validated_data)
@@ -99,14 +139,35 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
                 old_value = eski_degerler.get(field_name)
                 new_value = getattr(instance, field_name)
 
-                # Tarihleri string formatına çevir
-                if isinstance(old_value, (datetime.date, datetime.datetime)):
-                    old_value = old_value.isoformat()
-                if isinstance(new_value, (datetime.date, datetime.datetime)):
-                    new_value = new_value.isoformat()
+                # ForeignKey kontrolü (customer, brand gibi)
+                if hasattr(new_value, 'pk'):
+                    old_val = old_value if old_value else None
+                    new_val = {'id': new_value.pk, 'str': str(new_value)} if new_value else None
+                    
+                    # Karşılaştırma için ID'leri kullan
+                    old_id = old_val['id'] if old_val and isinstance(old_val, dict) else None
+                    new_id = new_val['id'] if new_val else None
+                    
+                    if old_id != new_id:
+                        changed_fields[field_name] = {
+                            'old': old_val,
+                            'new': new_val
+                        }
+                else:
+                    # Tarihleri string formatına çevir
+                    old_val = old_value
+                    new_val = new_value
+                    
+                    if isinstance(old_val, (datetime.date, datetime.datetime)):
+                        old_val = old_val.isoformat()
+                    if isinstance(new_val, (datetime.date, datetime.datetime)):
+                        new_val = new_val.isoformat()
 
-                if old_value != new_value:
-                    changed_fields[field_name] = new_value
+                    if old_val != new_val:
+                        changed_fields[field_name] = {
+                            'old': old_val,
+                            'new': new_val
+                        }
 
             # Sadece değişiklik varsa log kaydet
             if changed_fields:

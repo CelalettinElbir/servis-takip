@@ -8,6 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
         read_only_fields = ['id']
+        ref_name = "ApiUserSerializer"
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -16,6 +17,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
+        ref_name = "ApiUserCreateSerializer"
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -35,6 +37,7 @@ class BrandSerializer(serializers.ModelSerializer):
         model = Brand
         fields = ['id', 'name', 'description', 'is_active', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
+        ref_name = "ApiBrandSerializer"
         
         
         
@@ -46,3 +49,4 @@ class CustomerSerializer(serializers.ModelSerializer):
             'email', 'tax_number', 'tax_office', 'is_active', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+        ref_name = "ApiCustomerSerializer"

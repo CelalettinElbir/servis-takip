@@ -33,38 +33,48 @@ interface Brand {
 }
 
 interface NewService {
-  musteri_adi: string;
-  marka: string;
+  id?: number;
+  customer_id: number | null;
+  brand_id: number | null;
   model: string;
-  seri_no: string;
-  servis_ismi: string;
-  ariza: string;
-  gelis_tarihi: string;
-  aksesuar: string | null;
-  status: string;
+  serial_number: string | null;
+  accessories: string | null;
+  arrival_date: string;
+  issue: string | null;
+  service_name: string;
+  service_send_date: string | null;
+  service_operation: string | null;
+  service_return_date: string | null;
+  delivery_date: string | null;
+  status: 'pending' | 'sent_to_service' | 'returned_from_service' | 'delivered';
+  updated_at?: string;
+  created_user?: number;
 }
 
 const ServiceNew: React.FC = () => {
   const navigate = useNavigate();
   const [service, setService] = useState<NewService>({
-    musteri_adi: "",
-    marka: "",
+    customer_id: null,
+    brand_id: null,
     model: "",
-    seri_no: "",
-    servis_ismi: "",
-    ariza: "",
-    gelis_tarihi: "",
-    aksesuar: "",
-    status: "beklemede",
+    serial_number: null,
+    accessories: null,
+    arrival_date: new Date().toISOString().split('T')[0],
+    issue: null,
+    service_name: "",
+    service_send_date: null,
+    service_operation: null,
+    service_return_date: null,
+    delivery_date: null,
+    status: "pending"
   });
 
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
-    null
-  );
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
 
   const searchCustomers = async (searchTerm: string) => {
     setLoading(true);
@@ -78,18 +88,17 @@ const ServiceNew: React.FC = () => {
     }
   };
 
-  const fetchBrands = async () => {
+  const searchBrands = async (searchTerm: string) => {
+    setLoading(true);
     try {
-      const response = await API.get("brands/");
+      const response = await API.get(`brands/?search=${searchTerm}`);
       setBrands(response.data.results);
     } catch (error) {
       console.error("Error fetching brands:", error);
+    } finally {
+      setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchBrands();
-  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -97,21 +106,26 @@ const ServiceNew: React.FC = () => {
     setService({ ...service, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
-    setSaving(true);
-    try {
-      const postData = { ...service };
-      await API.post("Services/", postData);
-      alert("Yeni kayıt başarıyla oluşturuldu!");
-      console.log(postData);
-      navigate("/services");
-    } catch (err) {
-      console.error(err);
-      alert("Kayıt oluşturulurken hata oluştu!");
-    } finally {
-      setSaving(false);
-    }
-  };
+const handleSubmit = async () => {
+  setSaving(true);
+  try {
+    const postData = {
+      ...service,
+      customer_id: selectedCustomer?.id || null,
+      brand_id: selectedBrand?.id || null,
+    };
+    await API.post("Services/", postData);
+    alert("Yeni kayıt başarıyla oluşturuldu!");
+    console.log("Gönderilen veri:", postData);
+    navigate("/services");
+  } catch (err) {
+    console.error(err);
+    alert("Kayıt oluşturulurken hata oluştu!");
+  } finally {
+    setSaving(false);
+  }
+};
+
 
   return (
     <Box sx={{ p: 3 }}>
@@ -134,14 +148,14 @@ const ServiceNew: React.FC = () => {
               options={customers}
               loading={loading}
               value={selectedCustomer}
-              onChange={(event, newValue) => {
+              onChange={(_, newValue) => {
                 setSelectedCustomer(newValue);
                 setService((prev) => ({
                   ...prev,
-                  musteri_adi: newValue?.company_name || "",
+                  customer_id: newValue?.id || null
                 }));
               }}
-              onInputChange={(event, newInputValue) => {
+              onInputChange={(_, newInputValue) => {
                 if (newInputValue) searchCustomers(newInputValue);
               }}
               getOptionLabel={(option) => option.company_name}
@@ -155,14 +169,20 @@ const ServiceNew: React.FC = () => {
           <Box sx={{ flex: "1 1 200px" }}>
             <Autocomplete
               options={brands}
-              value={brands.find((b) => b.name === service.marka) || null}
-              onChange={(_, newValue) =>
+              loading={loading}
+              value={selectedBrand}
+              onChange={(_, newValue) => {
+                setSelectedBrand(newValue);
                 setService((prev) => ({
                   ...prev,
-                  marka: newValue ? newValue.name : "",
-                }))
-              }
+                  brand_id: newValue?.id || null
+                }));
+              }}
+              onInputChange={(_, newInputValue) => {
+                if (newInputValue) searchBrands(newInputValue);
+              }}
               getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
                 <TextField {...params} label="Marka" fullWidth />
               )}
@@ -182,8 +202,8 @@ const ServiceNew: React.FC = () => {
           <Box sx={{ flex: "1 1 200px" }}>
             <TextField
               label="Seri No"
-              name="seri_no"
-              value={service.seri_no}
+              name="serial_number"
+              value={service.serial_number || ""}
               onChange={handleChange}
               fullWidth
             />
@@ -202,8 +222,8 @@ const ServiceNew: React.FC = () => {
           <Box sx={{ flex: "1 1 250px" }}>
             <TextField
               label="Servis İsmi"
-              name="servis_ismi"
-              value={service.servis_ismi}
+              name="service_name"
+              value={service.service_name}
               onChange={handleChange}
               fullWidth
             />
@@ -212,8 +232,8 @@ const ServiceNew: React.FC = () => {
           <Box sx={{ flex: "1 1 250px" }}>
             <TextField
               label="Aksesuar"
-              name="aksesuar"
-              value={service.aksesuar || ""}
+              name="accessories"
+              value={service.accessories || ""}
               onChange={handleChange}
               fullWidth
             />
@@ -222,9 +242,9 @@ const ServiceNew: React.FC = () => {
           <Box sx={{ flex: "1 1 200px" }}>
             <TextField
               label="Geliş Tarihi"
-              name="gelis_tarihi"
+              name="arrival_date"
               type="date"
-              value={service.gelis_tarihi}
+              value={service.arrival_date}
               onChange={handleChange}
               fullWidth
               InputLabelProps={{ shrink: true }}
@@ -236,8 +256,8 @@ const ServiceNew: React.FC = () => {
         <Box sx={{ mt: 3 }}>
           <TextField
             label="Arıza"
-            name="ariza"
-            value={service.ariza}
+            name="issue"
+            value={service.issue || ""}
             onChange={handleChange}
             fullWidth
             multiline

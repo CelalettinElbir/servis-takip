@@ -20,20 +20,46 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import API from "../api";
 
+interface Customer {
+  id: number;
+  company_code: string;
+  company_name: string;
+  address: string;
+  email: string;
+  tax_number: string;
+  tax_office: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Brand {
+  id: number;
+  name: string;
+  description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ServiceRecord {
   id: number;
-  musteri_adi: string;
-  marka: string;
+  customer: Customer;
+  brand: Brand;
   model: string;
-  seri_no: string;
-  servis_ismi: string;
-  ariza: string;
-  servise_gonderim_tarihi: string | null;
-  servisten_gelis_tarihi: string | null;
-  teslim_tarihi: string | null;
-  status: string;
-  gelis_tarihi: string;
+  serial_number: string;
+  accessories: string | null;
+  arrival_date: string;
+  issue: string;
+  service_name: string;
+  service_send_date: string | null;
+  service_operation: string | null;
+  service_return_date: string | null;
+  delivery_date: string | null;
   created_user: number | null;
+  status: 'pending' | 'sent_to_service' | 'returned_from_service' | 'delivered';
+  updated_at: string;
+  logs: any[];
 }
 
 const Services = () => {
@@ -69,10 +95,10 @@ const Services = () => {
   const filteredRecords = records.filter((record) => {
     const searchLower = search.toLowerCase();
     return (
-      record.musteri_adi.toLowerCase().includes(searchLower) ||
-      `${record.marka} ${record.model}`.toLowerCase().includes(searchLower) ||
-      record.seri_no.toLowerCase().includes(searchLower) ||
-      record.servis_ismi.toLowerCase().includes(searchLower)
+      record.customer.company_name.toLowerCase().includes(searchLower) ||
+      `${record.brand.name} ${record.model}`.toLowerCase().includes(searchLower) ||
+      (record.serial_number?.toLowerCase() || "").includes(searchLower) ||
+      record.service_name.toLowerCase().includes(searchLower)
     );
   });
 
@@ -151,22 +177,22 @@ const Services = () => {
           <TableBody>
             {filteredRecords.map((record) => {
               let durumColor = "warning.main";
-              let durumText = record.status;
-              debugger;
+              let durumText = "";
+              
               switch (record.status) {
-                case 'beklemede':
+                case 'pending':
                   durumColor = "warning.main";
                   durumText = "Beklemede";
                   break;
-                case 'servise_gitti':
+                case 'sent_to_service':
                   durumColor = "error.main";
                   durumText = "Servise Gitti";
                   break;
-                case 'servisten_geldi':
+                case 'returned_from_service':
                   durumColor = "info.main";
                   durumText = "Servisten Geldi";
                   break;
-                case 'teslim_edildi':
+                case 'delivered':
                   durumColor = "success.main";
                   durumText = "Teslim Edildi";
                   break;
@@ -174,12 +200,12 @@ const Services = () => {
 
               return (
                 <TableRow key={record.id}>
-                  <TableCell>{record.musteri_adi}</TableCell>
-                  <TableCell>{`${record.marka} ${record.model}`}</TableCell>
-                  <TableCell>{record.seri_no}</TableCell>
-                  <TableCell>{record.servis_ismi}</TableCell>
-                  <TableCell>{record.ariza}</TableCell>
-                  <TableCell>{record.servise_gonderim_tarihi}</TableCell>
+                  <TableCell>{record.customer.company_name}</TableCell>
+                  <TableCell>{`${record.brand.name} ${record.model}`}</TableCell>
+                  <TableCell>{record.serial_number}</TableCell>
+                  <TableCell>{record.service_name}</TableCell>
+                  <TableCell>{record.issue}</TableCell>
+                  <TableCell>{record.service_send_date}</TableCell>
                   <TableCell>
                     <Typography sx={{ color: durumColor, fontWeight: "bold" }}>
                       {durumText}

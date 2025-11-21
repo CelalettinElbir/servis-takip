@@ -12,6 +12,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'password2')
+        ref_name = "AccountsRegisterSerializer"
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
@@ -34,6 +35,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name']
         read_only_fields = ['id']
+        ref_name = "AccountsUserSerializer"
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -42,6 +44,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password']
+        ref_name = "AccountsUserCreateSerializer"
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -63,3 +66,4 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'service_record', 'message', 
                  'created_at', 'is_read', 'overdue_days']
         read_only_fields = ['created_at']
+        ref_name = "AccountsNotificationSerializer"
