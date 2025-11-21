@@ -110,3 +110,7 @@ class seederClass:
 
         print(f"✅ Marka aktarımı tamamlandı — Başarılı: {success_count}, Hatalı: {error_count}")
         return True
+
+
+    @transaction.atomic
+    def seed_Services_name(self)

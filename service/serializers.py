@@ -2,8 +2,17 @@
 import datetime
 
 from api.serializers import BrandSerializer, CustomerSerializer
-from .models import ServiceLog, ServiceRecord
+from .models import ServiceLog, ServiceRecord, Service
 from api.models import Brand, Customer
+
+
+# --- SERVICE SERIALIZER ---
+class ServiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Service
+        fields = ['id', 'name', 'description', 'address', 'phone', 'email', 'is_active', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+        ref_name = "ServiceSerializer"
 
 
 # --- LOG SERIALIZER ---
@@ -21,7 +30,8 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
     # Her servis kaydının loglarını dahil et
     logs = serializers.SerializerMethodField()
     customer = CustomerSerializer(read_only=True)
-    brand =  BrandSerializer(read_only=True)
+    brand = BrandSerializer(read_only=True)
+    service = ServiceSerializer(read_only=True)
     customer_id = serializers.PrimaryKeyRelatedField(
         queryset=Customer.objects.all(),
         source='customer',
@@ -32,20 +42,25 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
         source='brand',
         write_only=True
     )
+    service_id = serializers.PrimaryKeyRelatedField(
+        queryset=Service.objects.all(),
+        source='service',
+        write_only=True
+    )
     class Meta:
         model = ServiceRecord
         ref_name = "ServiceRecordSerializer"
         fields = [
             'id',
-             'brand_id', 'customer_id',
+            'brand_id', 'customer_id', 'service_id',
             'customer',                 # müşteri
             'brand',                    # marka
+            'service',                  # servis
             'model',                    # model
             'serial_number',            # seri_no
             'accessories',              # aksesuar
             'arrival_date',             # gelis_tarihi
             'issue',                    # ariza
-            'service_name',             # servis_ismi
             'service_send_date',        # servise_gonderim_tarihi
             'service_operation',        # yapilan_islem
             'service_return_date',      # servisten_gelis_tarihi

@@ -42,6 +42,18 @@ interface Brand {
   updated_at: string;
 }
 
+interface ServiceCompany {
+  id: number;
+  name: string;
+  description: string;
+  address: string;
+  phone: string;
+  email: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ServiceRecord {
   id: number;
   customer: Customer;
@@ -51,7 +63,7 @@ interface ServiceRecord {
   accessories: string | null;
   arrival_date: string;
   issue: string;
-  service_name: string;
+  service: ServiceCompany | null;
   service_send_date: string | null;
   service_operation: string | null;
   service_return_date: string | null;
@@ -66,6 +78,7 @@ const Services = () => {
   const [records, setRecords] = useState<ServiceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,11 +87,15 @@ const Services = () => {
 
   const fetchRecords = async () => {
     try {
+      setError(null);
       const response = await API.get("Services/");
       console.log(response.data.results);
-      setRecords(response.data.results);
-    } catch (err) {
+      setRecords(response.data.results || []);
+    } catch (err: any) {
       console.error(err);
+      const errorMessage = err.response?.data?.message || 'Servis kayıtları yüklenirken hata oluştu';
+      setError(errorMessage);
+      setRecords([]);
     } finally {
       setLoading(false);
     }
@@ -98,7 +115,7 @@ const Services = () => {
       record.customer.company_name.toLowerCase().includes(searchLower) ||
       `${record.brand.name} ${record.model}`.toLowerCase().includes(searchLower) ||
       (record.serial_number?.toLowerCase() || "").includes(searchLower) ||
-      record.service_name.toLowerCase().includes(searchLower)
+      (record.service?.name?.toLowerCase() || "").includes(searchLower)
     );
   });
 
@@ -113,6 +130,29 @@ const Services = () => {
         }}
       >
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3, textAlign: 'center' }}>
+        <Typography color="error" variant="h6" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+        <Button 
+          variant="contained" 
+          onClick={fetchRecords}
+          sx={{ mr: 2 }}
+        >
+          Tekrar Dene
+        </Button>
+        <Button 
+          variant="outlined" 
+          onClick={handleNewRecord}
+        >
+          Yeni Kayıt Ekle
+        </Button>
       </Box>
     );
   }
@@ -137,7 +177,14 @@ const Services = () => {
           label="Ara (Müşteri / Marka-Model / Seri No / Servis)"
           variant="outlined"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            const value = e.target.value;
+            // Maksimum 100 karakter sınırı
+            if (value.length <= 100) {
+              setSearch(value);
+            }
+          }}
+          helperText={search.length > 50 ? `${search.length}/100 karakter` : ''}
           sx={{
             width: { xs: "100%", sm: 400 },
             "& .MuiInputBase-root": {
@@ -146,7 +193,7 @@ const Services = () => {
               alignItems: "center", // input içindeki texti ortalar
             },
             "& .MuiInputLabel-root": {
-              top: "-2px", // label’ı ortalamak için küçük tweak
+              top: "-2px", // label'ı ortalamak için küçük tweak
             },
           }}
         />
@@ -175,7 +222,25 @@ const Services = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRecords.map((record) => {
+            {filteredRecords.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
+                  <Typography variant="body1" color="textSecondary">
+                    {search ? 'Arama kriterlerinize uygun kayıt bulunamadı.' : 'Henüz hiç servis kaydı bulunmuyor.'}
+                  </Typography>
+                  {!search && (
+                    <Button 
+                      variant="outlined" 
+                      onClick={handleNewRecord}
+                      sx={{ mt: 2 }}
+                    >
+                      İlk Kaydınızı Oluşturun
+                    </Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredRecords.map((record) => {
               let durumColor = "warning.main";
               let durumText = "";
               
@@ -203,7 +268,7 @@ const Services = () => {
                   <TableCell>{record.customer.company_name}</TableCell>
                   <TableCell>{`${record.brand.name} ${record.model}`}</TableCell>
                   <TableCell>{record.serial_number}</TableCell>
-                  <TableCell>{record.service_name}</TableCell>
+                  <TableCell>{record.service?.name || '--'}</TableCell>
                   <TableCell>{record.issue}</TableCell>
                   <TableCell>{record.service_send_date}</TableCell>
                   <TableCell>
@@ -222,7 +287,7 @@ const Services = () => {
                   </TableCell>
                 </TableRow>
               );
-            })}
+            }))}
           </TableBody>
         </Table>
       </TableContainer>

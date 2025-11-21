@@ -5,6 +5,26 @@ from django.dispatch import receiver
 from django.contrib.auth import get_user_model
 import json
 from api.models import Customer, Brand
+
+
+class Service(models.Model):
+    """Servis firması/adı modeli"""
+    name = models.CharField(max_length=255, unique=True, verbose_name="Servis Adı")
+    description = models.TextField(blank=True, null=True, verbose_name="Açıklama")
+    address = models.TextField(blank=True, null=True, verbose_name="Adres")
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefon")
+    email = models.EmailField(blank=True, null=True, verbose_name="E-posta")
+    is_active = models.BooleanField(default=True, verbose_name="Aktif")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Servis"
+        verbose_name_plural = "Servisler"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 class ServiceLog(models.Model):
     service_record = models.ForeignKey('ServiceRecord', on_delete=models.CASCADE, related_name='logs')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
@@ -35,7 +55,7 @@ class ServiceRecord(models.Model):
     accessories = models.CharField(max_length=255, blank=True, null=True)
     arrival_date = models.DateField()
     issue = models.TextField(blank=True, null=True)
-    service_name = models.CharField(max_length=255)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True, verbose_name="Servis")
     service_send_date = models.DateField(blank=True, null=True)
     service_operation = models.TextField(blank=True, null=True)
     service_return_date = models.DateField(blank=True, null=True)

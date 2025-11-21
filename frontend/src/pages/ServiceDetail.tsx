@@ -24,6 +24,15 @@ interface Brand {
   name: string;
 }
 
+interface ServiceCompany {
+  id: number;
+  name: string;
+  description?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+}
+
 interface ServiceDetail {
   id: number;
   customer: {
@@ -51,7 +60,17 @@ interface ServiceDetail {
   accessories: string | null;
   arrival_date: string;
   issue: string | null;
-  service_name: string;
+  service: {
+    id: number;
+    name: string;
+    description: string;
+    address: string;
+    phone: string;
+    email: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  } | null;
   service_send_date: string | null;
   service_operation: string | null;
   service_return_date: string | null;
@@ -125,7 +144,7 @@ const ServiceDetailPage: React.FC = () => {
       'accessories': 'Aksesuar',
       'arrival_date': 'Geliş Tarihi',
       'issue': 'Arıza',
-      'service_name': 'Servis İsmi',
+      'service': 'Servis Firması',
       'service_send_date': 'Servise Gönderim Tarihi',
       'service_operation': 'Yapılan İşlem',
       'service_return_date': 'Servisten Geliş Tarihi',
@@ -151,8 +170,10 @@ const ServiceDetailPage: React.FC = () => {
   const [service, setService] = useState<ServiceDetail | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const [serviceCompanies, setServiceCompanies] = useState<ServiceCompany[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceCompany | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -169,13 +190,17 @@ const ServiceDetailPage: React.FC = () => {
       console.log("Gelen servis verisi:", response);
       setService(data);
 
-      // Customer ve brand seçimlerini set et
+      // Customer, brand ve service seçimlerini set et
       setSelectedCustomer(
         data.customer ? { id: data.customer.id, company_name: data.customer.company_name } : null
       );
 
       setSelectedBrand(
         data.brand ? { id: data.brand.id, name: data.brand.name } : null
+      );
+
+      setSelectedService(
+        data.service ? { id: data.service.id, name: data.service.name } : null
       );
 
       setError(null);
@@ -205,6 +230,15 @@ const ServiceDetailPage: React.FC = () => {
     }
   };
 
+  const searchServiceCompanies = async (searchTerm: string) => {
+    try {
+      const response = await API.get(`ServiceCompanies/?search=${searchTerm}`);
+      setServiceCompanies(response.data.results);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -221,6 +255,7 @@ const ServiceDetailPage: React.FC = () => {
         ...service,
         customer_id: selectedCustomer?.id || null,
         brand_id: selectedBrand?.id || null,
+        service_id: selectedService?.id || null,
       };
 
       await API.put(`Services/${id}/`, postData);
@@ -314,13 +349,15 @@ const ServiceDetailPage: React.FC = () => {
               fullWidth
             />
           </Box>
-          <Box sx={{ flex: "1 1 250px" }}>
-            <TextField
-              label="Servis İsmi"
-              name="service_name"
-              value={service.service_name}
-              onChange={handleChange}
-              fullWidth
+          <Box sx={{ flex: "1 1 200px" }}>
+            <Autocomplete
+              options={serviceCompanies}
+              value={selectedService}
+              onChange={(_, newValue) => setSelectedService(newValue)}
+              onInputChange={(_, input) => input && searchServiceCompanies(input)}
+              getOptionLabel={(option) => option.name}
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              renderInput={(params) => <TextField {...params} label="Servis Firması" fullWidth />}
             />
           </Box>
           <Box sx={{ flex: "1 1 200px" }}>
