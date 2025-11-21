@@ -71,6 +71,83 @@ const ServiceDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  // Tarih formatı helper fonksiyonu
+  const formatDateTime = (dateString: string | null) => {
+    if (!dateString) return "--";
+    try {
+      const date = new Date(dateString);
+      // Invalid date check
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', dateString);
+        return dateString;
+      }
+      return date.toLocaleString("tr-TR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error, dateString);
+      return dateString;
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "--";
+    try {
+      const date = new Date(dateString);
+      // Invalid date check
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', dateString);
+        return dateString;
+      }
+      return date.toLocaleDateString("tr-TR", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error, dateString);
+      return dateString;
+    }
+  };
+
+  // Alan adlarını Türkçe'ye çevir
+  const translateFieldName = (fieldName: string) => {
+    const translations: Record<string, string> = {
+      'customer': 'Müşteri',
+      'brand': 'Marka',
+      'model': 'Model',
+      'serial_number': 'Seri Numarası',
+      'accessories': 'Aksesuar',
+      'arrival_date': 'Geliş Tarihi',
+      'issue': 'Arıza',
+      'service_name': 'Servis İsmi',
+      'service_send_date': 'Servise Gönderim Tarihi',
+      'service_operation': 'Yapılan İşlem',
+      'service_return_date': 'Servisten Geliş Tarihi',
+      'delivery_date': 'Teslim Tarihi',
+      'status': 'Durum',
+      'updated_at': 'Güncellenme Tarihi',
+      'created_user': 'Kayıt Yapan Kullanıcı'
+    };
+    return translations[fieldName] || fieldName;
+  };
+
+  // Durum değerlerini Türkçe'ye çevir
+  const translateStatus = (status: string) => {
+    const statusTranslations: Record<string, string> = {
+      'pending': 'Beklemede',
+      'sent_to_service': 'Servise Gitti',
+      'returned_from_service': 'Servisten Geldi',
+      'delivered': 'Teslim Edildi'
+    };
+    return statusTranslations[status] || status;
+  };
+
   const [service, setService] = useState<ServiceDetail | null>(null);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -179,9 +256,14 @@ const ServiceDetailPage: React.FC = () => {
         Geri Dön
       </Button>
 
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Servis Detayı #{service.id}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Typography variant="h5">
+          Servis Detayı #{service.id}
+        </Typography>
+        <Typography variant="body2" sx={{ color: '#666' }}>
+          Son Güncelleme: {formatDateTime(service.updated_at)}
+        </Typography>
+      </Box>
 
       <Paper elevation={3} sx={{ p: 3 }}>
         {/* Satır 1: Customer / Brand / Model */}
@@ -327,15 +409,87 @@ const ServiceDetailPage: React.FC = () => {
           {service.logs.length > 0 ? (
             service.logs.map((log) => (
               <Box key={log.id} sx={{ mb: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
-                <Typography variant="subtitle2">Kullanıcı: {log.user}</Typography>
-                <Typography variant="subtitle2">
-                  Tarih: {new Date(log.change_date).toLocaleString("tr-TR")}
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+                  Kullanıcı: {log.user}
                 </Typography>
-                {Object.entries(log.changed_fields).map(([field, value]) => (
-                  <Typography key={field} variant="body2">
-                    • {field}: {typeof value === 'object' ? JSON.stringify(value) : String(value)}
-                  </Typography>
-                ))}
+                <Typography variant="subtitle2" sx={{ color: '#666', mb: 1 }}>
+                  Tarih: {formatDateTime(log.change_date)}
+                </Typography>
+                <Box sx={{ pl: 2 }}>
+                  {Object.entries(log.changed_fields).map(([fieldName, fieldValue]) => {
+                    const renderValue = (value: any) => {
+                      console.log('Rendering value:', fieldName, value); // Debug log
+                      
+                      if (value === null || value === undefined) return "--";
+                      
+                      if (typeof value === 'object') {
+                        if (value.old !== undefined && value.new !== undefined) {
+                          const formatSingleValue = (val: any) => {
+                            if (val === null || val === undefined) return "--";
+                            if (typeof val === 'object') {
+                              return val.str || JSON.stringify(val);
+                            }
+                            if (typeof val === 'string') {
+                              // Status translation
+                              if (fieldName === 'status') {
+                                return translateStatus(val);
+                              }
+                              // ISO datetime format check
+                              if (val.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+                                return formatDateTime(val);
+                              }
+                              // Date only format check
+                              if (val.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                                return formatDate(val);
+                              }
+                            }
+                            return String(val);
+                          };
+                          
+                          const oldVal = formatSingleValue(value.old);
+                          const newVal = formatSingleValue(value.new);
+                          
+                          return (
+                            <span>
+                              <span style={{ color: '#d32f2f', textDecoration: 'line-through' }}>
+                                {oldVal}
+                              </span>
+                              {' → '}
+                              <span style={{ color: '#2e7d32', fontWeight: 'bold' }}>
+                                {newVal}
+                              </span>
+                            </span>
+                          );
+                        }
+                        return JSON.stringify(value);
+                      }
+                      
+                      // String value formatting
+                      if (typeof value === 'string') {
+                        // Status translation
+                        if (fieldName === 'status') {
+                          return translateStatus(value);
+                        }
+                        // ISO datetime format check
+                        if (value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+                          return formatDateTime(value);
+                        }
+                        // Date only format check
+                        if (value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                          return formatDate(value);
+                        }
+                      }
+                      
+                      return String(value);
+                    };
+                    
+                    return (
+                      <Typography key={fieldName} variant="body2" sx={{ mb: 0.5 }}>
+                        <strong>{translateFieldName(fieldName)}:</strong> {renderValue(fieldValue)}
+                      </Typography>
+                    );
+                  })}
+                </Box>
               </Box>
             ))
           ) : (

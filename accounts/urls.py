@@ -1,5 +1,5 @@
 ﻿from django.urls import path
-from .views import NotificationListView, RegisterView
+from .views import NotificationListView, RegisterView,NotificationUpdateView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from api.views import UserListView, UserCreateView, current_user    
 urlpatterns = [
@@ -11,4 +11,5 @@ urlpatterns = [
     path('users/register/', UserCreateView.as_view(), name='user_register'),
     path('me/', current_user, name='current_user'),
     path('notifications/', NotificationListView.as_view(), name='notification_list'),
+     path("notifications/<int:pk>/", NotificationUpdateView.as_view(), name="notification-update"),
 ]

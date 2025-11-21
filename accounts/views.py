@@ -53,6 +53,17 @@ class NotificationListView(generics.ListAPIView):
 
     def get_queryset(self):
         # Sadece giriş yapmış kullanıcının bildirimlerini döndür
+        return self.queryset.filter(user=self.request.user).order_by('-created_at')
+    
+    
+class NotificationUpdateView(generics.UpdateAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Kullanıcı sadece kendi bildirimlerini güncelleyebilir
         return self.queryset.filter(user=self.request.user)
+    
     
     
