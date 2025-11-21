@@ -77,6 +77,11 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         try:
             user = self.context['request'].user
+            
+            # Teslim tarihi varsa otomatik olarak durumu 'delivered' yap
+            if validated_data.get('delivery_date'):
+                validated_data['status'] = ServiceRecord.STATUS_DELIVERED
+            
             instance = super().create(validated_data)
 
             # Tarihleri JSON formatına dönüştür
@@ -107,8 +112,19 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
             return instance
 
         except Exception as e:
-            print(f"Hata oluştu: {str(e)}")
-            raise serializers.ValidationError({"error": "Kayıt oluşturulurken bir hata oluştu."})
+            print(f"Create metodunda hata oluştu: {str(e)}")
+            print(f"Hata tipi: {type(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
+            
+            # Eğer validation hatasıysa, detayları geçir
+            if hasattr(e, 'detail'):
+                raise e
+            
+            raise serializers.ValidationError({
+                "error": f"Kayıt oluşturulurken bir hata oluştu: {str(e)}",
+                "details": str(e)
+            })
 
 
     def update(self, instance, validated_data):

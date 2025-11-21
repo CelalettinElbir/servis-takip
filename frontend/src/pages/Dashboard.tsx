@@ -1,14 +1,14 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import {
   Box,
-  Grid,
   Card,
   CardContent,
   Typography,
   CircularProgress,
   Paper,
   Chip,
-  Alert
+  Alert,
+  Stack
 } from '@mui/material';
 import {
   Build as BuildIcon,
@@ -120,114 +120,139 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold' }}>
-        Servis Takip Dashboard
-      </Typography>
+      <Paper 
+        elevation={2} 
+        sx={{ 
+          p: 3, 
+          mb: 3, 
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+          borderRadius: 2
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 1, fontWeight: 'bold', color: '#2c3e50' }}>
+          Servis Takip Dashboard
+        </Typography>
+        <Typography variant="body1" color="textSecondary">
+          Genel istatistikler ve sistem özeti
+        </Typography>
+      </Paper>
 
       {/* Genel İstatistikler */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-            <CardContent sx={{ color: 'white', textAlign: 'center' }}>
-              <AssessmentIcon sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {stats.total_records}
-              </Typography>
-              <Typography variant="body1">
-                Toplam Kayıt
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+      <Paper elevation={1} sx={{ p: 3, mb: 4, borderRadius: 2 }}>
+        <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#2c3e50' }}>
+          Ana İstatistikler
+        </Typography>
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          spacing={3}
+          sx={{ mb: 2 }}
+        >
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
+              <CardContent sx={{ color: 'white', textAlign: 'center' }}>
+                <AssessmentIcon sx={{ fontSize: 40, mb: 1 }} />
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {stats.total_records}
+                </Typography>
+                <Typography variant="body1">
+                  Toplam Kayıt
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
-            <CardContent sx={{ color: 'white', textAlign: 'center' }}>
-              <DateRangeIcon sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {stats.monthly_records}
-              </Typography>
-              <Typography variant="body1">
-                Bu Ay
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}>
+              <CardContent sx={{ color: 'white', textAlign: 'center' }}>
+                <DateRangeIcon sx={{ fontSize: 40, mb: 1 }} />
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {stats.monthly_records}
+                </Typography>
+                <Typography variant="body1">
+                  Bu Ay
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-            <CardContent sx={{ color: 'white', textAlign: 'center' }}>
-              <TodayIcon sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {stats.weekly_records}
-              </Typography>
-              <Typography variant="body1">
-                Son 7 Gün
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
+              <CardContent sx={{ color: 'white', textAlign: 'center' }}>
+                <TodayIcon sx={{ fontSize: 40, mb: 1 }} />
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {stats.weekly_records}
+                </Typography>
+                <Typography variant="body1">
+                  Son 7 Gün
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
 
-        <Grid item xs={12} sm={6} md={3}>
-          <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
-            <CardContent sx={{ color: 'white', textAlign: 'center' }}>
-              <ScheduleIcon sx={{ fontSize: 40, mb: 1 }} />
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                {stats.status_summary.waiting_delivery}
-              </Typography>
-              <Typography variant="body1">
-                Teslim Bekliyor
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+          <Box sx={{ flex: 1, minWidth: { xs: '100%', sm: '200px' } }}>
+            <Card sx={{ height: '100%', background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}>
+              <CardContent sx={{ color: 'white', textAlign: 'center' }}>
+                <ScheduleIcon sx={{ fontSize: 40, mb: 1 }} />
+                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                  {stats.status_summary.waiting_delivery}
+                </Typography>
+                <Typography variant="body1">
+                  Teslim Bekliyor
+                </Typography>
+              </CardContent>
+            </Card>
+          </Box>
+        </Stack>
+      </Paper>
 
-      <Grid container spacing={3}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
         {/* Durum Özeti */}
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+        <Box sx={{ flex: 2, minWidth: 0 }}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#2c3e50' }}>
               Durum Özeti
             </Typography>
-            <Grid container spacing={2}>
+            <Stack spacing={2}>
               {Object.entries(stats.status_summary).map(([status, count]) => (
-                <Grid item xs={12} sm={6} key={status}>
-                  <Card 
-                    sx={{ 
-                      p: 2, 
-                      display: 'flex', 
-                      alignItems: 'center',
-                      borderLeft: `4px solid ${getStatusColor(status)}`,
-                      '&:hover': { boxShadow: 3 }
-                    }}
-                  >
-                    <Box sx={{ mr: 2, color: getStatusColor(status) }}>
-                      {getStatusIcon(status)}
-                    </Box>
-                    <Box>
-                      <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                        {count}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary">
-                        {getStatusText(status)}
-                      </Typography>
-                    </Box>
-                  </Card>
-                </Grid>
+                <Card 
+                  key={status}
+                  sx={{ 
+                    p: 2, 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    borderLeft: `4px solid ${getStatusColor(status)}`,
+                    '&:hover': { 
+                      boxShadow: 3,
+                      transform: 'translateY(-2px)',
+                      transition: 'all 0.2s ease-in-out'
+                    }
+                  }}
+                >
+                  <Box sx={{ mr: 2, color: getStatusColor(status) }}>
+                    {getStatusIcon(status)}
+                  </Box>
+                  <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
+                      {count}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                      {getStatusText(status)}
+                    </Typography>
+                  </Box>
+                </Card>
               ))}
-            </Grid>
+            </Stack>
           </Paper>
-        </Grid>
+        </Box>
 
         {/* En Çok Servis Verilen Markalar */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
+        <Box sx={{ flex: 1, minWidth: { xs: '100%', md: '300px' } }}>
+          <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
+            <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#2c3e50' }}>
               Popüler Markalar
             </Typography>
             {stats.top_brands.length > 0 ? (
-              <Box>
+              <Stack spacing={2}>
                 {stats.top_brands.map((brand, index) => (
                   <Box
                     key={brand.brand__name}
@@ -235,11 +260,16 @@ const Dashboard = () => {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      py: 1,
-                      borderBottom: index < stats.top_brands.length - 1 ? '1px solid #eee' : 'none'
+                      p: 2,
+                      borderRadius: 1,
+                      backgroundColor: index % 2 === 0 ? '#f8f9fa' : 'transparent',
+                      '&:hover': {
+                        backgroundColor: '#e3f2fd',
+                        transition: 'background-color 0.2s ease-in-out'
+                      }
                     }}
                   >
-                    <Typography variant="body1">
+                    <Typography variant="body1" sx={{ fontWeight: 500 }}>
                       {brand.brand__name || 'Bilinmeyen'}
                     </Typography>
                     <Chip
@@ -247,18 +277,19 @@ const Dashboard = () => {
                       size="small"
                       color="primary"
                       variant="outlined"
+                      sx={{ fontWeight: 'bold' }}
                     />
                   </Box>
                 ))}
-              </Box>
+              </Stack>
             ) : (
               <Typography variant="body2" color="textSecondary">
                 Henüz veri bulunmamaktadır.
               </Typography>
             )}
           </Paper>
-        </Grid>
-      </Grid>
+        </Box>
+      </Stack>
     </Box>
   );
 };

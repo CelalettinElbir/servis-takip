@@ -86,5 +86,3 @@ class Brand(models.Model):
         return self.name
     
     
-    
-class 

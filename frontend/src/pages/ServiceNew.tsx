@@ -132,14 +132,26 @@ const ServiceNew: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setService({ ...service, [name]: value });
-
+    
     // Hata temizle
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // Form validasyon fonksiyonu
+  // Servis seçimi değiştiğinde hataları temizle
+  const handleServiceChange = (newValue: ServiceCompany | null) => {
+    setSelectedService(newValue);
+    setService((prev) => ({
+      ...prev,
+      service_id: newValue?.id || null
+    }));
+    
+    // Servis hatasını temizle
+    if (errors.service) {
+      setErrors(prev => ({ ...prev, service: '' }));
+    }
+  };  // Form validasyon fonksiyonu
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -334,20 +346,20 @@ const ServiceNew: React.FC = () => {
               options={serviceCompanies}
               loading={loading}
               value={selectedService}
-              onChange={(_, newValue) => {
-                setSelectedService(newValue);
-                setService((prev) => ({
-                  ...prev,
-                  service_id: newValue?.id || null
-                }));
-              }}
+              onChange={(_, newValue) => handleServiceChange(newValue)}
               onInputChange={(_, newInputValue) => {
                 if (newInputValue) searchServiceCompanies(newInputValue);
               }}
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
               renderInput={(params) => (
-                <TextField {...params} label="Servis Firması" fullWidth />
+                <TextField 
+                  {...params} 
+                  label="Servis Firması (İsteğe Bağlı)" 
+                  fullWidth 
+                  helperText="Servis firması seçimi zorunlu değildir"
+                  error={!!errors.service}
+                />
               )}
             />
           </Box>
@@ -376,6 +388,65 @@ const ServiceNew: React.FC = () => {
               InputLabelProps={{ shrink: true }}
             />
           </Box>
+        </Box>
+
+        {/* Üçüncü satır: tarih alanları */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 2,
+            mb: 2,
+          }}
+        >
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Servise Gönderim Tarihi"
+              name="service_send_date"
+              type="date"
+              value={service.service_send_date || ""}
+              onChange={handleChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Servisten Geliş Tarihi"
+              name="service_return_date"
+              type="date"
+              value={service.service_return_date || ""}
+              onChange={handleChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Teslim Tarihi"
+              name="delivery_date"
+              type="date"
+              value={service.delivery_date || ""}
+              onChange={handleChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+        </Box>
+
+        {/* Yapılan İşlem */}
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Yapılan İşlem"
+            name="service_operation"
+            value={service.service_operation || ""}
+            onChange={handleChange}
+            fullWidth
+            multiline
+            rows={3}
+          />
         </Box>
 
         {/* Arıza açıklaması */}

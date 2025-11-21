@@ -177,6 +177,7 @@ const ServiceDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [serviceError, setServiceError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchService();
@@ -249,6 +250,14 @@ const ServiceDetailPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!service) return;
+    
+    // Servis firması kontrolü
+    if (!selectedService) {
+      setServiceError("Servis firması seçilmesi zorunludur.");
+      return;
+    }
+    setServiceError(null);
+    
     setSaving(true);
     try {
       const postData = {
@@ -353,11 +362,25 @@ const ServiceDetailPage: React.FC = () => {
             <Autocomplete
               options={serviceCompanies}
               value={selectedService}
-              onChange={(_, newValue) => setSelectedService(newValue)}
+              onChange={(_, newValue) => {
+                setSelectedService(newValue);
+                if (newValue) {
+                  setServiceError(null);
+                }
+              }}
               onInputChange={(_, input) => input && searchServiceCompanies(input)}
               getOptionLabel={(option) => option.name}
               isOptionEqualToValue={(option, value) => option.id === value.id}
-              renderInput={(params) => <TextField {...params} label="Servis Firması" fullWidth />}
+              renderInput={(params) => (
+                <TextField 
+                  {...params} 
+                  label="Servis Firması"
+                  required
+                  error={!!serviceError}
+                  helperText={serviceError}
+                  fullWidth 
+                />
+              )}
             />
           </Box>
           <Box sx={{ flex: "1 1 200px" }}>
@@ -401,6 +424,17 @@ const ServiceDetailPage: React.FC = () => {
               name="service_return_date"
               type="date"
               value={service.service_return_date || ""}
+              onChange={handleChange}
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
+          <Box sx={{ flex: "1 1 200px" }}>
+            <TextField
+              label="Teslim Tarihi"
+              name="delivery_date"
+              type="date"
+              value={service.delivery_date || ""}
               onChange={handleChange}
               fullWidth
               InputLabelProps={{ shrink: true }}

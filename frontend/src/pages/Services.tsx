@@ -217,6 +217,7 @@ const Services = () => {
               <TableCell>Servis İsmi</TableCell>
               <TableCell>Arıza</TableCell>
               <TableCell>Servise Gönderim Tarihi</TableCell>
+              <TableCell>Teslim Tarihi</TableCell>
               <TableCell>Durum</TableCell>
               <TableCell>Detay</TableCell>
             </TableRow>
@@ -224,7 +225,7 @@ const Services = () => {
           <TableBody>
             {filteredRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} sx={{ textAlign: 'center', py: 4 }}>
+                <TableCell colSpan={9} sx={{ textAlign: 'center', py: 4 }}>
                   <Typography variant="body1" color="textSecondary">
                     {search ? 'Arama kriterlerinize uygun kayıt bulunamadı.' : 'Henüz hiç servis kaydı bulunmuyor.'}
                   </Typography>
@@ -270,7 +271,8 @@ const Services = () => {
                   <TableCell>{record.serial_number}</TableCell>
                   <TableCell>{record.service?.name || '--'}</TableCell>
                   <TableCell>{record.issue}</TableCell>
-                  <TableCell>{record.service_send_date}</TableCell>
+                  <TableCell>{record.service_send_date || '--'}</TableCell>
+                  <TableCell>{record.delivery_date || '--'}</TableCell>
                   <TableCell>
                     <Typography sx={{ color: durumColor, fontWeight: "bold" }}>
                       {durumText}
