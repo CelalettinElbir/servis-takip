@@ -68,7 +68,7 @@ const Users: React.FC = () => {
       setLoading(true);
       setError('');
       
-      const response = await API.get('auth/users/');
+      const response = await API.get('/auth/users/');
       setUsers(response.data);
     } catch (err: any) {
       const errorMessage = 
@@ -116,7 +116,7 @@ const Users: React.FC = () => {
       setCreateLoading(true);
       setError('');
       
-      await API.post('/users/register/', {
+      await API.post('auth/users/register/', {
         username: newUser.username,
         email: newUser.email,
         password: newUser.password,
@@ -257,7 +257,7 @@ const Users: React.FC = () => {
                 <TableCell><strong>Kullanıcı Adı</strong></TableCell>
                 <TableCell><strong>Email</strong></TableCell>
                 <TableCell><strong>Ad Soyad</strong></TableCell>
-                <TableCell><strong>Durum</strong></TableCell>
+                {/* <TableCell><strong>Durum</strong></TableCell> */}
                 <TableCell><strong>Kayıt Tarihi</strong></TableCell>
               </TableRow>
             </TableHead>
@@ -281,7 +281,7 @@ const Users: React.FC = () => {
                         ? `${user.first_name || ''} ${user.last_name || ''}`.trim()
                         : '-'}
                     </TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       {user.is_staff && (
                         <Chip label="Admin" color="error" size="small" sx={{ mr: 0.5 }} />
                       )}
@@ -290,7 +290,7 @@ const Users: React.FC = () => {
                       ) : (
                         <Chip label="Pasif" color="default" size="small" />
                       )}
-                    </TableCell>
+                    </TableCell> */}
                     <TableCell>
                       {user.date_joined
                         ? new Date(user.date_joined).toLocaleDateString('tr-TR', {
