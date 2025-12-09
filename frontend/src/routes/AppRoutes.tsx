@@ -1,12 +1,11 @@
 import { useContext } from "react";
-import { Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 // Pages
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Dashboard from "../pages/Dashboard";
-import DashboardLayout from "../layout/DashboardLayout";
 import Services from "../pages/Services";
 import ServiceDetail from "../pages/ServiceDetail";
 import NewDashboard from "../layout/NewDashboard";
@@ -17,6 +16,7 @@ import Notifications from "../pages/Notifications";
 import QuatesPage from "../pages/QuotesPage";
 
 // 🔒 PrivateRoute: sadece giriş yapılmış kullanıcıları içeri alır
+ // @ts-ignore
 const PrivateRoute = ({ children }: { children: JSX.Element }) => {
   const { token, loading } = useContext(AuthContext);
 

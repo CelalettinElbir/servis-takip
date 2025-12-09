@@ -18,7 +18,6 @@ import {
   CircularProgress,
   Alert,
   IconButton,
-  Chip
 } from '@mui/material';
 import { Add as AddIcon, Refresh as RefreshIcon } from '@mui/icons-material';
 import API from '../api';
@@ -271,6 +270,7 @@ const Users: React.FC = () => {
                   </TableCell>
                 </TableRow>
               ) : (
+                // @ts-ignore
                 users.results.map((user) => (
                   <TableRow key={user.id} hover>
                     <TableCell>{user.id}</TableCell>

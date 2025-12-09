@@ -1,5 +1,4 @@
 // src/components/NewQuoteModal.tsx
-import React from "react";
 import {
   Dialog,
   DialogTitle,

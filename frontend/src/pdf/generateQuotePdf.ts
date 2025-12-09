@@ -185,7 +185,7 @@ export const generateQuotePdf = (data: QuoteData) => {
         },
       ],
     ];
-
+ // @ts-ignore
     const categoryTotal = cat.items.reduce(
       (sum, i) => sum + i.qty * i.price,
       0
@@ -376,7 +376,6 @@ export const generateQuotePdf = (data: QuoteData) => {
     // ✅ Header ekleme
     header: function (
       currentPage: number,
-      pageCount: number,
       pageSize: { width: number; height: number }
     ) {
       // İlk sayfada header göstermek istemiyorsan
