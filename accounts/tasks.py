@@ -2,7 +2,7 @@
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import get_user_model
-from service.models import ServisKayit
+from service.models import ServiceRecord as ServisKayit
 from accounts.models import Notification
 import time
 
