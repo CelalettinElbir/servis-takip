@@ -1,6 +1,7 @@
 ﻿version: "3.3"
+
 services:
-  # PostgreSQL Veritabanı
+  # PostgreSQL
   db:
     image: postgres:16-alpine
     restart: always
@@ -14,27 +15,17 @@ services:
       - "5432:5432"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # Redis (Celery için)
+  # Redis
   redis:
     image: redis:7-alpine
     restart: always
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # Django Backend
   backend:
@@ -54,17 +45,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - app-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/admin/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
   # Celery Worker
   celery:
@@ -72,8 +56,8 @@ services:
       context: .
       dockerfile: docker/backend/Dockerfile
     entrypoint: /entrypoint_celery.sh
-    restart: always
     command: celery -A backend worker -l info
+    restart: always
     environment:
       - DEBUG=False
       - DATABASE_URL=postgresql://postgres:localpass@db:5432/postgres
@@ -83,21 +67,19 @@ services:
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - app-network
 
-  # Celery Beat (Scheduled tasks)
+  # Celery Beat
   celery-beat:
     build:
       context: .
       dockerfile: docker/backend/Dockerfile
-    entrypoint:  /entrypoint_beat.sh
-    restart: always
+    entrypoint: /entrypoint_beat.sh
     command: celery -A backend beat -l info
+    restart: always
     environment:
       - DEBUG=False
       - DATABASE_URL=postgresql://postgres:localpass@db:5432/postgres
@@ -107,10 +89,8 @@ services:
       - static_volume:/app/static
       - media_volume:/app/media
     depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - db
+      - redis
     networks:
       - app-network
 
@@ -118,14 +98,14 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: ./docker/frontend/Dockerfile
+      dockerfile: docker/frontend/Dockerfile
     restart: always
     ports:
       - "3000:80"
     networks:
       - app-network
 
-  # Nginx Reverse Proxy
+  # Nginx
   nginx:
     image: nginx:alpine
     restart: always
