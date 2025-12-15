@@ -46,7 +46,7 @@ API.interceptors.response.use(
         if (!refreshToken) throw new Error('Refresh token yok');
 
         // Refresh token ile yeni access token al
-        const res = await axios.post('http://127.0.0.1:8000/api/auth/refresh/', {
+        const res = await axios.post('http://10.110.120.50/api/auth/refresh/', {
           refresh: refreshToken,
         });
 
