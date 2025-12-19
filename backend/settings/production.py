@@ -57,6 +57,8 @@ SESSION_CACHE_ALIAS = 'default'
 # Static files configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = '/app/staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 
 # Media files configuration
 MEDIA_URL = '/media/'

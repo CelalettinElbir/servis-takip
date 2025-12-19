@@ -67,8 +67,8 @@ const Dashboard = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'pending': return '#ff9800';
-      case 'sent_to_service': return '#2196f3';
-      case 'returned_from_service': return '#4caf50';
+      case 'in_service': return '#2196f3';
+      case 'waiting_delivery': return '#4caf50';
       case 'delivered': return '#8bc34a';
       default: return '#757575';
     }
@@ -77,8 +77,8 @@ const Dashboard = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending': return 'Beklemede';
-      case 'sent_to_service': return 'Serviste';
-      case 'returned_from_service': return 'Teslim Bekliyor';
+      case 'in_service': return 'Serviste';
+      case 'waiting_delivery': return 'Teslim Bekliyor';
       case 'delivered': return 'Teslim Edildi';
       default: return status;
     }
@@ -87,7 +87,7 @@ const Dashboard = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'pending': return <WarningIcon />;
-      case 'sent_to_service': return <BuildIcon />;
+      case 'in_service': return <BuildIcon />;
       case 'returned_from_service': return <ScheduleIcon />;
       case 'delivered': return <CheckCircleIcon />;
       default: return <AssessmentIcon />;
