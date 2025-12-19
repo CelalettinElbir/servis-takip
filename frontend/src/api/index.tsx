@@ -1,7 +1,7 @@
 ﻿import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://10.110.120.12/api/',
+  baseURL: 'http://10.110.120.17/api/',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -46,7 +46,7 @@ API.interceptors.response.use(
         if (!refreshToken) throw new Error('Refresh token yok');
 
         // Refresh token ile yeni access token al
-        const res = await axios.post('http://10.110.120.50/api/auth/refresh/', {
+        const res = await axios.post('http://10.110.120.17/api/auth/refresh/', {
           refresh: refreshToken,
         });
 
