@@ -73,10 +73,7 @@ const Login = () => {
           }}
         >
           <Box sx={{ mb: 3 }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 64, height: 64, marginBottom: 16 }} />
-            <Typography component="h1" variant="h5" align="center">
-              Netline Yazılım
-            </Typography>
+            <img src="/logo.png" alt="Logo" style={{ width: 192, height: 64, marginBottom: 16 }} />
           </Box>
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
