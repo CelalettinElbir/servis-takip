@@ -45,7 +45,9 @@ class ServiceRecordSerializer(serializers.ModelSerializer):
     service_id = serializers.PrimaryKeyRelatedField(
         queryset=Service.objects.all(),
         source='service',
-        write_only=True
+        write_only=True,
+        required=False,
+        allow_null=True
     )
     class Meta:
         model = ServiceRecord

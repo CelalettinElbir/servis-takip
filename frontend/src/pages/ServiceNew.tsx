@@ -209,12 +209,17 @@ const ServiceNew: React.FC = () => {
 
     setSaving(true);
     try {
-      const postData = {
+      const postData: any = {
         ...service,
         customer_id: selectedCustomer?.id || null,
         brand_id: selectedBrand?.id || null,
-        service_id: selectedService?.id || null,
       };
+
+      // Eğer servis seçildiyse ekle, yoksa gönderme
+      if (selectedService?.id) {
+        postData.service_id = selectedService.id;
+      }
+
       await API.post("Services/", postData);
       alert("Yeni kayıt başarıyla oluşturuldu!");
       console.log("Gönderilen veri:", postData);
